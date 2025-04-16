@@ -1,0 +1,47 @@
+---
+// src/pages/[lang]/test/[entry].astro
+import Layout from '../../../layouts/Layout.astro';
+import { getNonDefaultLanguages, getTranslations, getLocalizedPath } from '../../../i18n/ui';
+import { testProvider } from '../../../data/testProvider';
+
+
+export function getStaticPaths() {
+    const entries = testProvider.getAllEntries();
+    const languages = getNonDefaultLanguages();
+    console.log(`[[lang]/test/[entry].astro] Building paths for languages: ${languages.join(', ')}`);
+
+    const paths = [];
+    for (const lang of languages) { 
+        for (const entry of entries) {
+         
+            const params = { lang, entry: entry.id }; 
+            console.log(`[[lang]/test/[entry].astro] Generating path:`, params);
+            
+            paths.push({ params, props: { entryId: entry.id } });
+        }
+    }
+    return paths;
+}
+
+
+const { entryId } = Astro.props;
+const { lang, entry: entryParam } = Astro.params; 
+console.log(`[[lang]/test/[entry].astro] Rendering page for lang=${lang}, entryParam=${entryParam}, entryId=${entryId}`);
+
+const t = getTranslations(lang);
+const item = testProvider.getEntryById(entryId);
+
+if (!item) {
+    const redirectPath = getLocalizedPath('/test', lang); 
+    console.warn(`[[lang]/test/[entry].astro] Item not found for ID ${entryId}, redirecting to ${redirectPath}`);
+    return Astro.redirect(redirectPath);
+}
+---
+<Layout lang={lang} title={item.name}>
+    <h1>{item.name} ({lang?.toUpperCase()})</h1>
+    <p>{testProvider.getMeaning(item, lang)}</p>
+    <p>This page should be at <code>/{lang}/test/{item.id}</code></p>
+    <a href={getLocalizedPath('/test', lang)}>← {t['test.back']} ({lang?.toUpperCase()})</a>
+    <br/>
+    <a href={getLocalizedPath(`/test/${item.id}`, 'en')}>View this entry in EN</a>
+</Layout>

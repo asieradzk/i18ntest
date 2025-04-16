@@ -1,0 +1,26 @@
+---
+// src/pages/dictionary/index.astro
+import Layout from '../../layouts/Layout.astro';
+import { DEFAULT_LANGUAGE, getTranslations, getLocalizedPath } from '../../i18n/ui';
+import { testProvider } from '../../data/testProvider'; 
+
+const lang = DEFAULT_LANGUAGE;
+const t = getTranslations(lang);
+const entries = testProvider.getAllEntries(); 
+---
+<Layout lang={lang} title={t['test.title']}>
+    <h1>{t['test.title']} (EN)</h1>
+    <p>{t['test.content']} This page is at <code>/test</code>.</p>
+    <ul>
+        {entries.map(entry => (
+                <li>
+                    {/* Link uses entry.id which is analogous to entry.spelling */}
+                    <a href={getLocalizedPath(`/test/${entry.id}`, lang)}>
+                        {entry.name} (EN)
+                    </a>
+                </li>
+        ))}
+    </ul>
+    <p><a href={getLocalizedPath('/', lang)}>← Home (EN)</a></p>
+    <p><a href={getLocalizedPath('/test', 'es')}>Go to Dictionary (ES)</a></p>
+</Layout>

@@ -1,0 +1,37 @@
+---
+// src/pages/[lang]/test/index.astro
+import Layout from '../../../layouts/Layout.astro';
+import { getNonDefaultLanguages, getTranslations, getLocalizedPath } from '../../../i18n/ui';
+import { testProvider } from '../../../data/testProvider'; // Use testProvider
+
+export function getStaticPaths() {
+    const languages = getNonDefaultLanguages();
+    console.log(`[pages/[lang]/test/index.astro] Building paths for languages: ${languages.join(', ')}`);
+    return languages.map(lang => {
+        const params = { lang };
+        console.log(`[pages/[lang]/test/index.astro] Generating path:`, params);
+        return { params };
+    });
+}
+
+const { lang } = Astro.params;
+console.log(`[pages/[lang]/test/index.astro] Rendering page for lang=${lang}`);
+const t = getTranslations(lang);
+const entries = testProvider.getAllEntries(); // Use testProvider
+---
+<Layout lang={lang} title={t['test.title']}>
+    <h1>{t['test.title']} ({lang?.toUpperCase()})</h1>
+    <p>{t['test.content']} This page is at <code>/{lang}/test</code>.</p>
+    <ul>
+        {entries.map(entry => (
+                <li>
+                    {/* Link uses entry.id */}
+                    <a href={getLocalizedPath(`/test/${entry.id}`, lang)}>
+                        {entry.name} ({lang?.toUpperCase()})
+                    </a>
+                </li>
+        ))}
+    </ul>
+    <p><a href={getLocalizedPath('/', lang)}>← Home ({lang?.toUpperCase()})</a></p>
+    <p><a href={getLocalizedPath('/test', 'en')}>Go to test (EN)</a></p>
+</Layout>

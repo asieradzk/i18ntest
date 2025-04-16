@@ -1,0 +1,33 @@
+---
+// src/pages/[lang]/index.astro
+import Layout from '../../layouts/Layout.astro';
+import { getNonDefaultLanguages, getTranslations, getLocalizedPath } from '../../i18n/ui'; 
+
+export function getStaticPaths() {
+    const languages = getNonDefaultLanguages();
+    console.log(`[pages/[lang]/index.astro] Building paths for languages: ${languages.join(', ')}`);
+    return languages.map(lang => {
+        const params = { lang };
+        console.log(`[pages/[lang]/index.astro] Generating path:`, params);
+        return { params };
+    });
+}
+
+const { lang } = Astro.params;
+console.log(`[pages/[lang]/index.astro] Rendering page for lang=${lang}`);
+const t = getTranslations(lang);
+---
+<Layout lang={lang}>
+    <h1>{t['app.name']} (Homepage {lang?.toUpperCase()})</h1>
+    <p>Welcome! This page is at <code>/{lang}</code>.</p>
+    <p>
+        <a href={getLocalizedPath('/test', lang)}>Go to test ({lang?.toUpperCase()})</a>
+    </p>
+    <p>
+        {/* ADD THIS LINK */}
+        <a href={getLocalizedPath('/about', lang)}>Go to About Page ({lang?.toUpperCase()})</a>
+    </p>
+    <p>
+        <a href={getLocalizedPath('/', 'lang')}>Go to Homepage (EN)</a>
+    </p>
+</Layout>

@@ -1,0 +1,29 @@
+---
+// src/components/NavBar.astro
+import { getTranslations, createNavItem, DEFAULT_LANGUAGE } from '../i18n/ui';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+
+interface Props {
+    lang?: string;
+}
+const { lang = DEFAULT_LANGUAGE } = Astro.props;
+const t = getTranslations(lang);
+
+
+const navItems = [
+    createNavItem('/', lang, 'nav.home'),
+    createNavItem('/test', lang, 'nav.test'), 
+    createNavItem('/about', lang, 'about.title') 
+];
+---
+<header style="background-color: #eee; padding: 1em; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <strong>{t['app.name']}</strong>
+        <nav style="display: inline-block; margin-left: 1em;">
+            {navItems.map(item => (
+                    <a href={item.href} style="margin-right: 1em;">{item.label}</a>
+            ))}
+        </nav>
+    </div>
+    <LanguageSwitcher currentLang={lang} />
+</header>

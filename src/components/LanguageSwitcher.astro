@@ -1,0 +1,45 @@
+---
+// src/components/LanguageSwitcher.astro
+import { LANGUAGES, DEFAULT_LANGUAGE } from '../i18n/ui';
+
+interface Props {
+    currentLang: string;
+}
+
+const { currentLang = DEFAULT_LANGUAGE } = Astro.props;
+const { pathname } = Astro.url;
+
+
+function getTargetLangUrl(targetLang: string) {
+    const currentPath = pathname;
+ 
+    const pathWithoutLang = currentPath.replace(/^\/[a-z]{2}(-[a-z]{2})?\//, '/');
+
+    if (targetLang === DEFAULT_LANGUAGE) {
+     
+        return pathWithoutLang === '' ? '/' : pathWithoutLang;
+    }
+
+    return `/${targetLang}${pathWithoutLang === '' ? '/' : pathWithoutLang}`;
+}
+
+
+const languageEntries = Object.entries(LANGUAGES);
+---
+<div class="language-switcher">
+    <label for="lang-select" style="margin-right: 0.5em;">Language:</label>
+    <select
+            id="lang-select"
+            onchange="window.location.href = this.value;"
+            style="border: 1px solid #ccc; padding: 0.2em;"
+    >
+        {languageEntries.map(([code, name]) => {
+            const targetUrl = getTargetLangUrl(code);
+            return (
+                    <option value={targetUrl} selected={code === currentLang}>
+                        {name}
+                    </option>
+            );
+        })}
+    </select>
+</div>

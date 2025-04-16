@@ -1,0 +1,40 @@
+---
+// src/pages/test/[entry].astro
+import Layout from '../../layouts/Layout.astro';
+import { DEFAULT_LANGUAGE, getTranslations, getLocalizedPath } from '../../i18n/ui';
+import { testProvider } from '../../data/testProvider'; 
+
+export function getStaticPaths() {
+    const entries = testProvider.getAllEntries();
+    console.log(`[pages/test/[entry].astro] Building default lang paths`);
+    return entries.map(entry => {
+        
+        const params = { entry: entry.id };
+        console.log(`[pages/test/[entry].astro] Generating path:`, params);
+       
+        return { params, props: { entryId: entry.id } };
+    });
+}
+
+const { entryId } = Astro.props;
+const { entry: entryParam } = Astro.params;
+const lang = DEFAULT_LANGUAGE;
+console.log(`[pages/test/[entry].astro] Rendering page for entryParam=${entryParam}, entryId=${entryId}, lang=${lang}`);
+
+const t = getTranslations(lang);
+const item = testProvider.getEntryById(entryId);
+
+if (!item) {
+    const redirectPath = getLocalizedPath('/test', lang); 
+    console.warn(`[pages/test/[entry].astro] Item not found for ID ${entryId}, redirecting to ${redirectPath}`);
+    return Astro.redirect(redirectPath);
+}
+---
+<Layout lang={lang} title={item.name}>
+    <h1>{item.name} (EN)</h1>
+    <p>{testProvider.getMeaning(item, lang)}</p> {/* Use getMeaning */}
+    <p>This page is at <code>/test/{item.id}</code></p>
+    <a href={getLocalizedPath('/test', lang)}>← {t['test.back']} (EN)</a>
+    <br/>
+    <a href={getLocalizedPath(`/test/${item.id}`, 'es')}>View this entry in ES</a>
+</Layout>

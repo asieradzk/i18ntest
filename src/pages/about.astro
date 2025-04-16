@@ -1,0 +1,24 @@
+---
+// src/pages/about.astro
+import Layout from '../layouts/Layout.astro';
+
+import { DEFAULT_LANGUAGE, getTranslations, getLocalizedPath } from '../i18n/ui';
+
+const lang = DEFAULT_LANGUAGE; // This page is only 'en'
+const t = getTranslations(lang);
+
+console.log(`[pages/about.astro] Rendering default language page.`);
+---
+{/* Pass the lang prop */}
+<Layout lang={lang} title={t['about.title']}>
+    <h1>{t['about.title']}</h1> {/* Display title from translations */}
+    <p>{t['about.content']}</p>
+    <p>This page is at <code>/about</code>.</p>
+    <p>
+        <a href={getLocalizedPath('/', lang)}>← Home ({lang.toUpperCase()})</a>
+    </p>
+    <p>
+        {/* This link should generate /es/about */}
+        <a href={getLocalizedPath('/about', 'es')}>View this page in ES</a>
+    </p>
+</Layout>
